@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/css/style-page2.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.js">  </script>
+  <script src="https://malsup.github.io/jquery.form.js"></script>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+</head>
+<script>
+
+  $(document).ready(function () {
+
+    $('#check').ajaxForm({
+      url: '/qrcode',
+      resetForm: true,
+      success: sucessmessage
+    });
+
+  });
+  function sucessmessage(responseText, statusText, xhr, $form) {
+
+    if (responseText.Status == "success") {
+      console.log(responseText["Message"])
+      new QRCode(document.getElementById("qrcode"), responseText["Message"]);
+
+    }
+    else {
+      alert("Wrong OrderID")
+    }
+  }
+
+</script>
+
+
+<body>
+  <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+  <title>QR Code Generator</title>
+  <div class="container-fluid">
+    <div id="qrcode"></div>
+    <div class="form-horizontal">
+      <form method="post" id="check" action="/qrcode" target="dummyframe">
+        <div class="form-group"><label for="content" class="control-label col-sm-2">
+            OrderID:
+          </label>
+          <div class="col-sm-10"><!-- Input box to enter the
+              required data --><input type="text" size="60" maxlength="60" id="content" name="orderid"
+              placeholder="Enter content" class="form-control" /></div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10"><!-- Button to generate QR Code for
+           the entered data --><button type="submit" id="generate" class="btn btn-default">
+              Confirm Order
+            </button></div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+
+</body>
+
+
+</html>

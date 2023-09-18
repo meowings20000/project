@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<script src="https://malsup.github.io/jquery.form.js"></script>
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Users / Profile</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: NiceAdmin - v2.5.0
+  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+<script type="text/javascript">
+
+  $(document).ready(function () {
+    $("#header").load("header.html");
+    $("#footer").load("footer.html");
+    $("#sidebar").load("sidebar.html");
+    $("#form").hide();
+    $('#editorder').ajaxForm({
+      url: '/editorder',
+      resetForm: true,
+      success: sucessmessage,
+      error: failmessage
+
+    })
+  });
+  function sucessmessage(responseText, statusText, xhr, $form) {
+
+    alert("The order is updated");
+  }
+  function failmessage(responseText, statusText, xhr, $form) {
+
+
+    alert("Error");
+  }
+  fetch("ordertable").then(function (response) {
+    // The API call was successful!
+    return response.json()
+  }).then(function (result) {
+    table(result)
+  }).catch(function (err) {
+    // There was an error
+    console.warn('Something went wrong.', err);
+  });
+
+  function table(jsonData) {
+    let container = $("#accounts");
+
+    // Create the table element
+    let table = $("<table>");
+    table.addClass("center")
+    // Get the keys (column names) of the first object in the JSON data
+    let cols = Object.keys(jsonData[0]);
+
+    // Create the header element
+    let thead = $("<thead>");
+    let tr = $("<tr>");
+
+    // Loop through the column names and create header cells
+    $.each(cols, function (i, item) {
+      let th = $("<th>");
+      th.text(item); // Set the column name as the text of the header cell
+      tr.append(th); // Append the header cell to the header row
+    });
+    thead.append(tr); // Append the header row to the header
+    table.append(tr) // Append the header to the table
+
+    // Loop through the JSON data and create table rows
+    $.each(jsonData, function (i, item) {
+      let tr = $("<tr>");
+
+      // Get the values of the current object in the JSON data
+      let vals = Object.values(item);
+
+      // Loop through the values and create table cells
+      $.each(vals, (i, elem) => {
+        let td = $("<td>");
+        td.text(elem); // Set the value as the text of the table cell
+        tr.append(td); // Append the table cell to the table row
+      });
+      table.append(tr); // Append the table row to the table
+      tr.click(function () {
+        var currentRow = $(this).closest('tr')
+        var rCell1 = currentRow.find("td:eq(0)").text();
+        var rCell2 = currentRow.find("td:eq(1)").text();
+        var rCell3 = currentRow.find("td:eq(2)").text();
+        var rCell4 = currentRow.find("td:eq(3)").text();
+        var rCell5 = currentRow.find("td:eq(4)").text();
+        var rCell6 = currentRow.find("td:eq(5)").text();
+        var rCell7 = currentRow.find("td:eq(13)").text();
+        var rCell8 = currentRow.find("td:eq(7)").text();
+        $("#RName").val(rCell1)
+        $("#RAdd").val(rCell2)
+        $("#RPhone").val(rCell3)
+        $("#SName").val(rCell4)
+        $("#SAdd").val(rCell5)
+        $("#SPhone").val(rCell6)
+        $("#Weight").val(rCell7)
+        $("#order").val(rCell8)
+        $("#form").show();
+      });
+    });
+    container.empty()
+    container.append(table) // Append the table to the container element
+  }
+</script>
+
+<body>
+  <header id="header" class="header fixed-top d-flex align-items-center justify-content-between"></header>
+  <aside id="sidebar" class="sidebar"></aside>
+  <main id="main" class="main">
+    <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
+    <body>
+
+
+      <div id="form">
+        <div class="card mb-3">
+
+          <div class="card-body">
+            <form class="row g-3 needs-validation" novalidate action="/editorder" method="get" target="dummyframe"
+              id="editorder">
+              <input type="hidden" id="order" name="orderid" value="">
+              <div class="col-12">
+                <label for="RName" class="form-label">Receiver Name</label>
+                <input type="text" name="RName" class="form-control" id="RName" required>
+                <div class="invalid-feedback">Please enter the Receiver name!</div>
+              </div>
+
+              <div class="col-12">
+                <label for="RAdd" class="form-label">Receiver Address</label>
+                <input type="text" name="RAddress" class="form-control" id="RAdd" required>
+                <div class="invalid-feedback">Please enter the Receiver adddress!</div>
+              </div>
+              <div class="col-12">
+                <label for="RName" class="form-label">Receiver Phone</label>
+                <input type="text" name="RPhone" class="form-control" id="RPhone" required pattern="[0-9]{8}">
+                <div class="invalid-feedback">Please enter the Receiver Phone!</div>
+              </div>
+
+              <div class="col-12">
+                <label for="RName" class="form-label">Sender Name</label>
+                <input type="text" name="SName" class="form-control" id="SName" required>
+                <div class="invalid-feedback">Please enter the Sender name!</div>
+              </div>
+
+              <div class="col-12">
+                <label for="RAdd" class="form-label">Sender Address</label>
+                <input type="text" name="SAdd" class="form-control" id="SAdd" required>
+                <div class="invalid-feedback">Please eenter the Sender adddress!</div>
+              </div>
+
+              <div class="col-12">
+                <label for="RAdd" class="form-label">Sender Phone</label>
+                <input type="text" name="SPhone" class="form-control" id="SPhone" required>
+                <div class="invalid-feedback">Please eenter the Sender phone!</div>
+              </div>
+
+              <div class="col-12">
+                <label for="RName" class="form-label">Weight</label>
+                <input type="text" name="Weight" class="form-control" id="Weight" required pattern="[0-9]{0,4}">
+                <div class="invalid-feedback">Please enter the weight!</div>
+              </div>
+
+
+
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary w-100" type="submit">Edit Order</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div id="accounts" class="table table-stripped  table-bordered" style="overflow: scroll; "> </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </body>
+  </main><!-- End #main -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="assets/vendor/echarts/echarts.min.js"></script>
+  <script src="assets/vendor/quill/quill.min.js"></script>
+  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+</main>
+
+<!-- ======= Footer ======= -->
+<footer id="footer" class="footer">
+
+</footer><!-- End Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+    class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/chart.js/chart.umd.js"></script>
+<script src="assets/vendor/echarts/echarts.min.js"></script>
+<script src="assets/vendor/quill/quill.min.js"></script>
+<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="assets/vendor/tinymce/tinymce.min.js"></script>
+<script src="assets/vendor/php-email-form/validate.js"></script>
+
+<!-- Template Main JS File -->
+<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

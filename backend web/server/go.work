@@ -1,0 +1,8 @@
+go 1.19
+use ./db
+use ./main/backend
+use ./map
+use ./account
+use ./editor
+use ./main/frontend
+use ./orders

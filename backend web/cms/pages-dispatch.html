@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJeytG0koQtcGpU-5tWObFZBqPjYlDxd0"></script>
+<script src="https://malsup.github.io/jquery.form.js"></script>
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Order Dispatch</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: NiceAdmin - v2.5.0
+  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<script type="text/javascript">
+  function showmap() {
+    $("#googleMap").css('display', 'inline-block')
+    fetch("callmap").then(function (response) {
+      initMap()
+      // The API call was successful!
+      return response.json()
+    }).then(function (result) {
+      calcRoute(map, result)
+    }).catch(function (err) {
+      // There was an error
+      console.warn('Something went wrong.', err);
+    });
+
+  }
+  function neworder() {
+    fetch("neworder")
+    alert("Order has been distrubuted to the nearest driver")
+  }
+  $(document).ready(function () {
+    $("#header").load("header.html");
+    $("#footer").load("footer.html");
+    $("#sidebar").load("sidebar.html");
+    $("#orderno").append("<h5>Dispatch orders of the day</h5> <button class='btn btn-primary' onclick='showmap()'>Dispatch order</button>")
+    $("#neworder").append("<h5>Dispatch New orders of the day</h5> <button class='btn btn-primary' onclick='neworder()'>Dispatch NEW Order</button>")
+    $("#card").hide()
+    fetch("/ordertable").then(function (response) {
+      return response.json()
+    }).then(function (result) {
+      table(result)
+    })
+
+    $('#dispatchform').ajaxForm({
+      url: '/dispatch',
+      resetForm: true,
+      success: sucessmessage,
+      error: failmessage
+
+    })
+  });
+  function sucessmessage(responseText, statusText, xhr, $form) {
+
+    alert("The order(s) has been dispatched");
+  }
+  function failmessage(responseText, statusText, xhr, $form) {
+
+
+    alert("Error");
+  }
+
+  let map;
+  var directionsDisplay
+  async function initMap() {
+    // The location of Uluru
+    const position = { lat: 22.36450068560762, lng: 114.12058808501067 };
+    // Request needed libraries.
+    //@ts-ignore
+    const { Map } = await google.maps.importLibrary("maps");
+
+    // The map, centered at Uluru
+    map = new Map(document.getElementById("googleMap"), {
+      zoom: 12,
+      center: position,
+    });
+    directionsDisplay = new google.maps.DirectionsRenderer()
+    directionsDisplay.setMap(map);
+  }
+  function table(jsonData) {
+    let container = $("#orders");
+    // Create the table element
+    let table = $("<table>");
+    // Get the keys (column names) of the first object in the JSON data
+    let cols = Object.keys(jsonData[0]);
+    console.log(cols)
+    // Create the header element
+    let thead = $("<thead>");
+    let tr = $("<tr>");
+
+    // Loop through the column names and create header cells
+    $.each(cols, function (i, item) {
+      let th = $("<th>");
+      th.text(item); // Set the column name as the text of the header cell
+      tr.append(th); // Append the header cell to the header row
+    });
+    thead.append(tr); // Append the header row to the header
+    table.append(tr) // Append the header to the table
+
+    // Loop through the JSON data and create table rows
+
+    $.each(jsonData, function (i, item) {
+
+      if ((item["RDriverID "] === "")) {
+        let tr = $("<tr>");
+
+        // Get the values of the current object in the JSON data
+        let vals = Object.values(item);
+
+        // Loop through the values and create table cells
+        $.each(vals, (i, elem) => {
+          let td = $("<td>");
+          td.text(elem); // Set the value as the text of the table cell
+          tr.append(td); // Append the table cell to the table row
+        });
+        table.append(tr); // Append the table row to the table
+      }
+    });
+    container.empty()
+    container.append(table) // Append the table to the container element
+  }
+
+
+
+  async function calcRoute(map, result) {
+    var routes = result["routes"]
+    var arrroutes = new Array()
+    var routeid = new Array()
+    var routeids = new Array()
+    var start = { lat: result["places"]["origins"][0]["latitude"], lng: result["places"]["origins"][0]["longitude"] }
+    var startMark = new google.maps.Marker({
+      position: start,
+      map: map,
+      title: "start"
+    });
+    for (let i = 0; i < routes.length; i++) {
+      if (routes[i]["route"].length != 1) {
+        var routess = new Array()
+        var waypt = new Array()
+
+        routess.push(start)
+        for (let j = 1; j < routes[i]["route"].length - 1; j++) {
+          lat = result["places"]["destinations"][routes[i]["route"][j] - 1]["latitude"]
+          log = result["places"]["destinations"][routes[i]["route"][j] - 1]["longitude"]
+          var waypts = { lat: lat, lng: log }
+          waypt.push({ lat: lat, lng: log })
+          routess.push(waypts)
+        }
+        var end = { lat: result["places"]["destinations"][routes[i]["route"][routes.length - 1]]["latitude"], lng: result["places"]["destinations"][routes[i]["route"][routes.length - 1]]["longitude"] }
+        routess.push(end)
+
+        var endMark = new google.maps.Marker({
+          position: end,
+          map: map,
+          title: "end" + i
+        });
+
+        for (let o = 0; o < waypt.length; o++) {
+          var waypoint = new google.maps.Marker({
+            position: { lat: waypt[o]["lat"], lng: waypt[o]["lng"], },
+            map: map,
+            title: "waypoint" + i
+
+          });
+        }
+        arrroutes.push(routess)
+        routeid.push(routes[i]["route"])
+        routeids.push(i)
+      }
+    }
+
+    for (let i = 0; i < arrroutes.length; i++) {
+      var randomColor = Math.floor(Math.random() * 16777215).toString(16);
+      var polycolor = "#" + randomColor
+      var flightPath = new google.maps.Polyline({
+        path: arrroutes[i],
+        geodesic: true,
+        strokeColor: polycolor,
+        strokeOpacity: 1.0,
+        strokeWeight: 4,
+      });
+
+      flightPath.setMap(map);
+    }
+    form(arrroutes, routeid, routeids)
+  }
+  function form(arrroutes, routeid, routeids) {
+
+    $form = $("#dispatchform")
+    $("#hidden").val(routeids)
+    fetch("/actable").then(function (response) {
+      return response.json()
+    }).then(function (result) {
+      for (let o = 0; o < arrroutes.length; o++) {
+        $Route = $("<div><label for= 'Route' class= 'form-label'>Route:" + routeid[o] + "</label></div>")
+        $label = $("<div><label for= 'driver' class= 'form-label'>Driver ID</label>")
+        $select = $("<select name='DriverID" + o + "' id='driver' required>")
+        $label.append($select)
+        for (let p = 0; p < result.length; p++) {
+          if (result[p]["Role"] === "Driver") {
+            $option = $("<option>" + result[p]["StaffId"] + "</option>")
+            $select.append($option)
+          }
+        }
+        $closing = $("</select></div>")
+        $Route.append($select)
+        $form.append($Route);
+      }
+      $submit = $("<div class='col-12'><button class='btn btn-primary w-100' type='submit'>Dispatch Order</button></div>")
+      $form.append($submit);
+    })
+    $('#dispatch').empty()
+    $('#dispatch').append($form);
+    $('#card').show()
+  }
+
+
+</script>
+
+<body>
+  <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
+  <header id="header" class="header fixed-top d-flex align-items-center justify-content-between"></header>
+  <aside id="sidebar" class="sidebar"></aside>
+  <main id="main" class="main">
+    <div class="card mb-3" id="card">
+      <div class="card-body">
+        <div id="dispatch" class="d-flex align-items-center justify-content-between">
+          <form class='row g-3 needs-validation' novalidate action='/dispatch' method='get' target='dummyframe'
+            id='dispatchform'>
+            <input type='hidden' id='hidden' name='routeid' value="" />
+          </form>
+        </div>
+      </div>
+    </div>
+    <div id="orderno" class="d-flex align-items-center justify-content-between"> </div>
+    <div id="neworder" class="d-flex align-items-center justify-content-between"> </div>
+    <div id="orders" class="table table-stripped rows table-bordered table-sm" style="overflow: scroll;"> </div>
+    <div id="googleMap" style="width:100%;height:400px;display:none; "></div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.min.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+    <footer id="footer" class="footer"></footer>
+
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.min.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

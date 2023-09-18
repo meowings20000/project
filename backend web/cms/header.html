@@ -1,0 +1,54 @@
+
+<script>
+
+  function getCookie(name) {
+    var match = document.cookie.match(RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+    return match ? match[1] : null;
+  }
+  var match = getCookie("EmployeeName")
+  if (match === null) {
+    window.location = "pages-login.html"
+  }
+  function readCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}="`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+  $(document).ready(function () {
+    var cookiee = readCookie("EmployeeName")
+    cookiee.replace(/^"(.+(?="$))"$/, '$1')
+    cookiee = cookiee.substring(0, cookiee.length - 1);
+    $("#name").html(cookiee)
+  })
+</script>
+
+<div class="d-flex align-items-center justify-content-between">
+  <a href="index.html" class="logo d-flex align-items-center">
+    <span class="d-none d-lg-block">SmartFleet</span>
+  </a>
+
+
+</div><!-- End Icons Navigation -->
+<div class="d-flex align-items-center justify-content-between">
+  <nav class="header-nav ms-auto ">
+    <ul class="d-flex align-items-center">
+      <li class="nav-item dropdown pe-3 d-flex ">
+
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+          <!-- <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle"> -->
+          <span class="d-none d-md-block dropdown-toggle ps-2" id="name">K. Anderson</span>
+        </a><!-- End Profile Iamge Icon -->
+
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="pages-login.html">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sign Out</span>
+            </a>
+          </li>
+
+        </ul><!-- End Profile Dropdown Items -->
+      </li><!-- End Profile Nav -->
+    </ul>
+  </nav>
+</div>

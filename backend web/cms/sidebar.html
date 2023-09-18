@@ -1,0 +1,74 @@
+<script>
+
+  function readCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}="`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+  $(document).ready(function () {
+    var cookiee = readCookie("EmployeeRole")
+    if (cookiee === "Staff" || cookiee === "Driver") {
+      $("#ac").hide()
+    }
+  })
+</script>
+<ul class="sidebar-nav" id="sidebar-nav">
+  <li class="nav-item collapsed">
+    <a class="nav-link " href="index.html">
+      <i class="bi bi-grid"></i>
+      <span>Dashboard</span>
+    </a>
+  </li><!-- End Dashboard Nav -->
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="users-editpassword.html">
+      <i class="bi bi-person-square"></i>
+      <span>Edit Password</span>
+    </a>
+  </li><!-- End Profile Page Nav -->
+
+
+
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="pages-editor.html">
+      <i class="bi bi-layout-text-window"></i>
+      <span>Editor</span>
+    </a>
+  </li><!-- End Editor Page Nav -->
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="pages-order.html">
+      <i class="bx bx-box"></i>
+      <span>Orders</span>
+    </a>
+  </li><!-- End Order Page Nav -->
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="pages-dispatch.html">
+      <i class="bi bi-folder-symlink"></i>
+      <span>Dispatch</span>
+    </a>
+  </li> <!--End Dispatch Page Nav -->
+
+  <li class="nav-item" id="ac">
+    <a class="nav-link collapsed" data-bs-target="#accounts-nav" data-bs-toggle="collapse" href="#">
+      <i class="bi bi-people"></i>
+      <span>Accounts</span>
+      <i class="bi bi-chevron-down ms-auto"></i>
+    </a>
+    <ul id="accounts-nav" class="nav-content collapse ">
+      <li>
+        <a href="pages-register.html">
+          <i class="bi bi-person-plus "></i><span>New Account</span>
+        </a>
+      </li>
+      <li>
+        <a href="pages-editaccount.html">
+          <i class="bi bi-pencil-square"></i><span>Edit Accounts</span>
+        </a>
+      </li>
+    </ul>
+  </li><!-- End Accounts Page Nav -->
+
+</ul>
